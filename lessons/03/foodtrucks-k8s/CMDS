@@ -1,2 +1,10 @@
-helm repo add elastic https://helm.elastic.co
-helm install elasticsearch elastic/elasticsearch
+k3d Cluster
+===========
+
+1. Install k3d
+2. k3d cluster create --api-port 6550 -p 8081:80@loadbalancer --agents 1 mycluster
+
+-- OR
+
+use your existing Docker Desktop k8s but install Traefik ingress yourself:
+
