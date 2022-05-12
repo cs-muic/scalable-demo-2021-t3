@@ -7,7 +7,6 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: elasticsearch-server
-  serviceName: elasticsearch-mione-dev-svc
   template:
     metadata:
       labels:
@@ -15,7 +14,7 @@ spec:
     spec:
       initContainers:
       - command:
-        - /bin/bash
+        - /bin/sh
         - -c
         - if [[ "$(sysctl vm.max_map_count --values)" -lt 262144 ]]; then sysctl -w vm.max_map_count=262144; fi
         image: busybox

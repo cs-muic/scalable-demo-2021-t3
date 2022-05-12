@@ -17,3 +17,6 @@ spec:
       containers:
       - name: backend 
         image: ghcr.io/ktangwon/foodtrucks/ft-backend
+        env:
+        - name: ELASTIC_HOST
+          value: elasticsearch.default.svc
