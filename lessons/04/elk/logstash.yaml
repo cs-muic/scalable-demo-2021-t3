@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+  labels:
+    name: logstash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: logstash
+  template:
+    metadata:
+      labels:
+        name: logstash
+    spec:
+      containers:
+        - name: logstash
+          image: logstash:8.1.0
+          ports:
+          - containerPort: 5044
+            name: filebeat
+          env:
+          - name: ELASTICSEARCH_HOSTS
+            value: http://es.default.svc:9200
+          volumeMounts:
+          - name: logstash-pipeline
+            mountPath: /usr/share/logstash/pipeline/
+          command:
+            - logstash
+      volumes:
+        - name: logstash-pipeline
+          configMap:
+            name: logstash-pipeline
+            items:
+              - key: logstash.conf
+                path: logstash.conf
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-pipeline
+data:
+  logstash.conf: |
+    input {
+      beats {
+        port => "5044"
+      }
+    }
+    
+    output {
+      elasticsearch {
+        hosts => ["${ELASTICSEARCH_HOSTS}"]
+        index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+      }
+      stdout {
+        codec => rubydebug
+      }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logstash
+  labels:
+    name: logstash
+spec:
+  selector:
+    name: logstash
+  ports:
+  - port: 5044
+    protocol: TCP
+    targetPort: 5044

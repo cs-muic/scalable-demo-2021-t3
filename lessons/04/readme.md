@@ -1,0 +1,1 @@
+https://github.com/bbachi/k8s-sidecar-container-pattern

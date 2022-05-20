@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: es
+  labels:
+    name: es
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: es
+  template:
+    metadata:
+      labels:
+        name: es
+    spec:
+      containers:
+      - name: es
+        image: elasticsearch:8.1.0
+        ports:
+        - containerPort: 9200
+          name: http
+        env:
+          - name: ES_JAVA_OPTS
+            value: "-Xmx1024m -Xms1024m"
+          - name: discovery.type
+            value: single-node
+          - name: http.cors.enabled
+            value: "true"
+          - name: http.cors.allow-origin
+            value: "*"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: es
+  name: es
+spec:
+  selector:
+    name: es
+  ports:
+    - port: 9200
+      protocol: TCP
+      targetPort: 9200

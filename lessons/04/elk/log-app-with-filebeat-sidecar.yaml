@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-app-with-filebeat-sidecar
+  labels:
+    name: log-app-with-filebeat-sidecar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: log-app
+  template:
+    metadata:
+      labels:
+        name: log-app
+    spec:
+      containers:
+      - name: log-app
+        image: sladesoftware/log-application:latest
+        volumeMounts:
+        - name: log-output
+          mountPath: /tmp/
+      - name: filebeat-sidecar
+        image: elastic/filebeat:8.1.0
+        env:
+        - name: LOGSTASH_HOSTS
+          value: logstash.default.svc:5044
+        args: [
+          "-c", "/etc/filebeat/filebeat.yaml",
+           "-e"
+        ]
+        volumeMounts:
+        - name: log-output
+          mountPath: /tmp/
+        - name: beat-config
+          mountPath: /etc/filebeat/
+      volumes:
+      - name: log-output
+        emptyDir: {}
+      - name: beat-config
+        configMap:
+          name: beat-config
+          items:
+          - key: filebeat.yaml
+            path: filebeat.yaml
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: beat-config
+data:
+  filebeat.yaml: |
+    filebeat.inputs:
+      - type: log
+        paths:
+          - /tmp/output.log
+    
+    output:
+      logstash:
+        hosts: [ "${LOGSTASH_HOSTS}" ]
