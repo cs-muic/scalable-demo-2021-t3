@@ -19,6 +19,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("RESPONSE={:?}", response);
     let message = response.get_ref();
     println!("The message is {:?}\n", message.message);
+    
+    println!("=========== another request attempt ============");
+    let request = tonic::Request::new(
+        hello_world::BlessingRequest {
+            name: format!("Scalable Systems Folks"),
+            donation_amount: 1_000,
+        }
+    );
+    
+    let response = client.ask_for_blessing(request).await?;
+    println!("Message: {:?}", response.get_ref().message);
 
     Ok(())
 }
