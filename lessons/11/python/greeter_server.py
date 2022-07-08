@@ -26,6 +26,10 @@ class Greeter(helloworld_pb2_grpc.GreeterServicer):
     def SayHello(self, request, context):
         return helloworld_pb2.HelloReply(message='Hello, %s!' % request.name)
 
+    def AskForBlessing(self, request, context):
+        message = f'Ommmmmmmmm, {request.name} (thanks for donating {request.donation_amount} baht)'
+        return helloworld_pb2.HelloReply(message=message)
+
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=4))

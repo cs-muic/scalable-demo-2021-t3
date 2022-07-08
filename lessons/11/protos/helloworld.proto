@@ -25,11 +25,17 @@ package helloworld;
 service Greeter {
   // Sends a greeting
   rpc SayHello (HelloRequest) returns (HelloReply) {}
+  rpc AskForBlessing (BlessingRequest) returns (HelloReply) {}
 }
 
 // The request message containing the user's name.
 message HelloRequest {
   string name = 1;
+}
+
+message BlessingRequest {
+  string name = 1;
+  int32 donation_amount = 2;
 }
 
 // The response message containing the greetings
